@@ -27,9 +27,6 @@ var chartGroup = svg.append("g")
 // Load Data
 d3.csv("assets/data/data.csv").then(function (dabblerData) {
     
-    // View Data in Console
-    console.log(dabblerData);
-
     // Parse Data from CSV
     dabblerData.forEach(data => {
         data.healthcare = +data.healthcare;
@@ -66,7 +63,7 @@ d3.csv("assets/data/data.csv").then(function (dabblerData) {
         .attr("cx", d => xLinearScale(d.obesity))
         .attr("cy", d => yLinearScale(d.healthcare))
         .attr("r", "15")
-        .attr("fill", "lightblue")
+        .attr("fill", "lightblue");
     
     // Add Abbreviations in Circles
     chartGroup.selectAll("null")
@@ -80,21 +77,43 @@ d3.csv("assets/data/data.csv").then(function (dabblerData) {
         .attr("dy", 5)
         .attr("font-size", 15)
         .attr("fill", "white")
-        .attr("font-weight", "bold")
+        .attr("font-weight", "bold");
     
     // Axes Labels
     chartGroup.append("text")
-        .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top - 10})`)
+        .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + 50})`)
         .attr("class", "axisText")
-        .text("Obesity (%)");
+        .text("Obese (%)");
     
     chartGroup.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left + 40)
-        .attr("x", 0 - (chartHeight / 2))
+        .attr("x", -50 - (chartHeight / 2))
         .attr("dy", "1em")
         .attr("class", "axisText")
-        .text("Healthcare (% with)");
+        .text("Lack Healthcare (%)");
+    
+    // Create "toolTip"
+    var toolTip = d3.tip()
+        .attr("class", "tooltip")
+        // .offset([80, -60])
+        .html(function (d) {
+            return (abbr + '%');
+        });
+
+    // Display Circle Information
+    chartGroup.call(toolTip);
+
+    // Hover on Circle
+    circlesGroup.on("mouseover", function (dabblerData) {
+        toolTip.show(dabblerData);
+    })
+
+    // Hover off Circle
+    .on("mouseout", function (dabblerData, index) {
+        toolTip.hide(dabblerData);        
+    });
+
     
 }).catch(function (error) {
     console.log(error);
